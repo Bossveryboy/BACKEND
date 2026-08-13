@@ -1,7 +1,21 @@
 from flask import Flask, jsonify,request
 import sqlite3
 import hashlib
+import os
+import dotenv
+import wraps
+API_TOKEN = os.get_env("API_TOKEN")
 app = Flask(__name__)
+
+def require_token(f):
+     @wraps(f)
+     def decorated_function(*args,**kwargs):
+          token = request.header("Authorization")
+          if token != f"Brearer {API_TOKEN}":
+               return jsonify({"message":"Unauthorization"}) , 401
+          return f(*args, **kwargs)
+     return decorated_function
+
 def get_db_connection(name):
      change_name=name + ".db"
      import os
@@ -36,29 +50,32 @@ def hello():
      return jsonify({"message":"hello everyone"})
 
 
-@app.route('/products',methods=['GET','POST'])
+@app.route('/products',methods=['GET'])
 def get_products():
      if request.method == 'GET':
           conn = get_db_connection("products")
           rows = conn.execute("SELECT * FROM products").fetchall()
           conn.close()
-          return jsonify([dict(row) for row in rows])
-     elif request.method == 'POST' :
-          data = request.get_json()
-          conn = get_db_connection("products")
-          cursor = conn.cursor()
-          name = data.get("name")
-          cursor.execute("INSERT INTO products(name) VALUES(?)",(name,) )
-          conn.commit()
-          new_id = cursor.lastrowid
-          conn.close()
-          new_product ={
-               "id": new_id,
-               "name": name
-               }
-          return jsonify({"message":"added ok","product added":new_product}),201
+          return jsonify([dict(row) for row in rows]) ,200
+     
+@app.route('/products',methods=['POST'])
+def add_products():
+     data = request.get_json()
+     conn = get_db_connection("products")
+     cursor = conn.cursor()
+     name = data.get("name")
+     cursor.execute("INSERT INTO products(name) VALUES(?)",(name,) )
+     conn.commit()
+     new_id = cursor.lastrowid
+     conn.close()
+     new_product ={
+          "id": new_id,
+          "name": name
+          }
+     return jsonify({"message":"added ok","product added":new_product}),201
 
 @app.route('/register',methods=['POST'])
+@require_token
 def register():
      data = request.get_json()
      username = data.get("username")
