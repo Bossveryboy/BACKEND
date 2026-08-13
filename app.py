@@ -3,7 +3,7 @@ import sqlite3
 import hashlib
 import os
 import dotenv
-import wraps
+from functools import wraps
 API_TOKEN = os.get_env("API_TOKEN")
 app = Flask(__name__)
 
