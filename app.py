@@ -59,6 +59,7 @@ def get_products():
           return jsonify([dict(row) for row in rows]) ,200
      
 @app.route('/products',methods=['POST'])
+@require_token
 def add_products():
      data = request.get_json()
      conn = get_db_connection("products")
@@ -75,7 +76,6 @@ def add_products():
      return jsonify({"message":"added ok","product added":new_product}),201
 
 @app.route('/register',methods=['POST'])
-@require_token
 def register():
      data = request.get_json()
      username = data.get("username")
