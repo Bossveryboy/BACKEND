@@ -4,7 +4,7 @@ import hashlib
 import os
 import dotenv
 from functools import wraps
-API_TOKEN = os.get_env("API_TOKEN")
+API_TOKEN = os.getenv("API_TOKEN")
 app = Flask(__name__)
 
 def require_token(f):
