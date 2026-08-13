@@ -10,7 +10,7 @@ app = Flask(__name__)
 def require_token(f):
      @wraps(f)
      def decorated_function(*args,**kwargs):
-          token = request.header("Authorization")
+          token = request.headers("Authorization")
           if token != f"Brearer {API_TOKEN}":
                return jsonify({"message":"Unauthorization"}) , 401
           return f(*args, **kwargs)
