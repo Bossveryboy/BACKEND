@@ -109,7 +109,7 @@ def login():
      user = conn.execute("SELECT * FROM users WHERE username=? AND password = ?",(username,hash_password)).fetchone()
      conn.close()
      if user :
-          return jsonify({"message:": f"welcome{username}"}) , 200 
+          return jsonify({"message": f"welcome{username}"}) , 200 
      else :
           return jsonify({"message":"invalid credentials"}) , 401
 if (__name__=="__main__"):
